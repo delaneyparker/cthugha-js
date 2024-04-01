@@ -1,0 +1,40 @@
+{
+  "name": "pixi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack serve --open --mode development",
+    "build": "webpack --mode production"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "clean-webpack-plugin": "^4.0.0",
+    "css-minimizer-webpack-plugin": "^6.0.0",
+    "html-webpack-plugin": "^5.6.0",
+    "mini-css-extract-plugin": "^2.8.1",
+    "terser-webpack-plugin": "^5.3.10",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
+    "webpack": "^5.90.3",
+    "webpack-bundle-analyzer": "^4.10.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.2"
+  },
+  "dependencies": {
+    "@pixi/app": "^7.4.0",
+    "@pixi/canvas-renderer": "^7.4.0",
+    "@pixi/constants": "^7.4.0",
+    "@pixi/core": "^7.4.0",
+    "@pixi/display": "^7.4.0",
+    "@pixi/math": "^7.4.0",
+    "@pixi/runner": "^7.4.0",
+    "@pixi/settings": "^7.4.0",
+    "@pixi/sprite": "^7.4.0",
+    "@pixi/ticker": "^7.4.0",
+    "@pixi/utils": "^7.4.0"
+  }
+}

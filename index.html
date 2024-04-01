@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cthugha V5.3 - JS</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌀</text></svg>">
+  <style>
+    @font-face {
+      font-family: 'DOS';
+      src: url('public/fonts/Perfect_DOS_VGA_437.ttf') format('truetype');
+    }
+
+    * {
+      font-family: 'DOS', monospace;
+      font-size: 28px;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      justify-content: center;
+      align-items: center;
+      background-color: #000;
+      color: #FFF;
+    }
+
+    button {
+      cursor: pointer;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    .source-name {
+      flex-grow: 1;
+      writing-mode: horizontal-tb;
+      text-align: center;
+      transform: rotate(0deg);
+    }
+
+    #menu {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-grow: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.9);
+      color: #FFF;
+      cursor: pointer;
+      text-align: left;
+      z-index: 1;
+    }
+
+    #menu pre {
+      margin: 0;
+    }
+
+    #controlsMenu {
+      display: none; /* Controlled by JS */
+      flex-direction: column;
+      align-items: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      z-index: 100;
+      transition: opacity 0.5s ease;
+    }
+
+    #controlsContainer, #audioControlsContainer {
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: right;
+      width: 660px;
+      height: auto;
+    }
+
+    #controlsMenu button {
+      width: 50px;
+      height: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      background-color: rgba(0, 0, 0, 0.8);
+      color: #FFF;
+      margin: 5px;
+    }
+    #controlsMenu button:hover {
+      background-color: rgba(64, 64, 64, 0.8);
+    }
+
+    #audioControlsContainer button {
+      margin: 0 5px;
+    }
+
+    #musicControls, #microphoneControls {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      width: 100%;
+      height: 60px;
+      justify-content: flex-start;
+    }
+
+    #currentTrack {
+      flex-grow: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #playPauseLabel {
+      position: relative;
+      margin-top: -6px;
+      left: 1px;
+    }
+
+    #audioControlsContainer input[type="range"] {
+      flex: 0 0 auto; /* Do not grow, do not shrink, be auto width */
+      margin-left: auto; /* Push it to the right */
+      margin-top: 0;
+    }
+
+    #footer, #footerMobile {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      text-align: center;
+      color: #999;
+      font-size: 14px;
+    }
+    #footer span, #footerMobile span {
+      font-size: 14px;
+    }
+
+    #footerMobile {
+      display: none;
+    }
+    #startMobile {
+      display: none;
+    }
+
+    #audioSelector {
+      display: none; /* Controlled by JS */
+      /* display: flex; */
+      flex-direction: column;
+      align-items: center;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #000;
+      color: #FFF;
+      border: 2px solid #FFF;
+      border-radius: 10px;
+      z-index: 100;
+      width: 90%;
+      max-width: 500px;
+      box-sizing: border-box;
+      padding: 4px;
+    }
+
+    #audioSelector h2 {
+      margin: 0;
+      padding: 10px;
+      width: 100%;
+      text-align: center;
+      background-color: #000;
+      color: #FFF;
+      border-bottom: 2px solid #FFF;
+    }
+
+    #audioSelector button, #audioSelector #fileInputLabel {
+      width: 90%;
+      margin: 10px auto;
+      background-color: #000;
+      color: #FFF;
+      border: 2px solid #FFF;
+      height: 64px;
+      cursor: pointer;
+      text-align: left;
+      line-height: 44px;
+      padding: 10px;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #audioSelector .label {
+      display: inline-block;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #audioSelector #fileInputLabel {
+      padding-top: 8px;
+    }
+
+    button:last-child, #fileInputLabel:last-of-type {
+      margin-bottom: 0;
+    }
+
+    button:hover, #fileInputLabel:hover {
+      background-color: #444;
+    }
+
+    ul {
+      width: 100%;
+      padding: 0;
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Styles for range input (slider) */
+    input[type="range"] {
+      appearance: none;
+      height: 20px;
+      -webkit-appearance: none;
+      background: transparent;
+    }
+
+    /* Thumb styling for Chrome, Safari, and newer Edge versions */
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 8px;
+      height: 20px;
+      background: #FFFFFF;
+      border: 1px solid #000;
+      margin-top: -9px;
+      cursor: pointer;
+    }
+
+    /* Thumb styling for Firefox */
+    input[type="range"]::-moz-range-thumb {
+      width: 8px;
+      height: 20px;
+      background: #FFFFFF;
+      border: 1px solid #000;
+      cursor: pointer;
+    }
+
+    /* Track styling for Chrome, Safari, and newer Edge versions */
+    input[type="range"]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 2px;
+      background: #FFFFFF;
+      cursor: pointer;
+    }
+
+    /* Track styling for Firefox */
+    input[type="range"]::-moz-range-track {
+      width: 100%;
+      height: 2px;
+      background: #FFFFFF;
+      cursor: pointer;
+    }
+
+    /* For Firefox, style the progress part (before the thumb) */
+    input[type="range"]::-moz-range-progress {
+      background: #FFFFFF;
+    }
+
+    /* Remove focus outline */
+    input[type="range"]:focus {
+      outline: none;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: 170px;
+      height: 50px;
+      margin-right: 4px;
+      margin-bottom: 0;
+    }
+
+    .slider-container .label {
+      margin-right: 10px;
+      margin-top: 0;
+    }
+
+    /* Misc. tweaks for smaller screens */
+    @media (max-width: 1024px) or (max-height: 780px){
+      #controls {
+        display: none;
+      }
+      #footer {
+        display: none;
+      }
+      #start {
+        display: none;
+      }
+      #startMobile {
+        display: block;
+        padding-top: 28px;
+      }
+      #footerMobile {
+        display: block;
+      }
+      #audioSelector {
+        width: 95%;
+        padding: 10px;
+      }
+    }
+    @media (max-width: 720px) {
+      .title {
+        font-size: 14px;
+      }
+    }
+    @media (orientation: landscape) {
+      #audioSelector {
+        /* width: 90%; */
+        max-height: 90%;
+        overflow-y: auto;
+      }
+    }
+    /* @media (orientation: portrait) { */
+    @media (max-width: 660px) {
+      html, body {
+        flex-direction: row;
+      }
+      #controlsMenu {
+        flex-direction: row;
+        /* top: auto; */
+        /* left: 0; */
+      }
+      #controlsContainer, #audioControlsContainer {
+        flex-direction: column;
+        width: auto;
+        height: 660px;
+      }
+      #audioControlsContainer button {
+        margin: 5px;
+      }
+      #musicControls, #microphoneControls {
+        flex-direction: column;
+        width: 60px;
+        height: 100%;
+      }
+      #audioControlsContainer input[type="range"] {
+        margin-left: 0;
+        margin-top: auto;
+      }
+      .slider-container {
+        flex-direction: column;
+        width: 50px;
+        height: 170px;
+        margin-bottom: 4px;
+        margin-right: 0;
+      }
+      .slider-container .label {
+        margin-right: 0;
+        margin-top: 30px;
+      }
+      .source-name {
+        writing-mode: vertical-lr;
+        transform: rotate(180deg);
+      }
+      #microphoneControls .source-name {
+        max-height: 350px;
+      }
+      #musicControls .source-name {
+        max-height: 230px;
+      }
+      input[type="range"] {
+        width: 170px;
+        height: 20px;
+        /* width: 20px;
+        height: 170px; */
+        transform: rotate(270deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="menu">
+
+<!-- Title Section -->
+<pre class="title">
+Cthugha V5.3
+An Oscilliscope on Acid
+
+by the Digital Aasvogel Group. 1993-1995
+   Revision V5.3 - 25Nov94 zaph
+</pre>
+
+<!-- Controls Section -->
+<pre id="controls">
+
+  🕹 CONTROLS 🕹
+
+  🔊 M KEY to change the Music (or use Microphone)
+  🌊 W KEY to change Wave function
+  🔥 F KEY to change Flame function
+  🎨 P KEY to change color Palette
+  🌈 T KEY to change color Table (how palette is used)
+  🌀 D KEY to change Display function (including TABs)
+  📻 B KEY to show / hide the Boom Boxes
+
+  🔒 L KEY to switch between Lock mode and random 🔮
+  🎲 - / + KEYS to change randomization speed
+  💫 C KEY to turn on / off color Cycling
+  <!-- ⏱ SHIFT and -/+ KEYS to change framerate -->
+
+  🖥 X KEY to stop music and return to this screen
+
+</pre>
+
+<!-- Start Section -->
+<pre id="start" style="text-align: center;">
+... CLICK / TAP TO START ...
+</pre>
+<pre id="startMobile" style="text-align: center;">
+... TAP TO START ...
+</pre>
+
+<!-- Footer Section -->
+<pre id="footer" style="color: #999;">
+JavaScript port by Delaney Parker - Mar2024 <span>me</span>@dpa<span>rker.org</span>
+</pre>
+<pre id="footerMobile" style="color: #999;">
+JS port by Delaney Parker - me @ dparker.org
+</pre>
+
+  </div>
+
+  <div id="controlsMenu">
+    <div id="controlsContainer"></div>
+    <div id="audioControlsContainer">
+      <div id="musicControls">
+        <button id="playPause"><span id="playPauseLabel"></span></button>
+        <button id="prevTrack">&lt;
+          <!-- ⏮ -->
+          <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="16" height="16">
+            <polygon points="50,0 50,100 0,50" fill="currentColor"/>
+            <polygon points="100,0 100,100 50,50" fill="currentColor"/>
+          </svg> -->
+        </button>
+        <button id="nextTrack">&gt;
+          <!-- ⏭ -->
+          <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="16" height="16">
+            <polygon points="0,0 50,50 0,100" fill="currentColor"/>
+            <polygon points="50,0 100,50 50,100" fill="currentColor"/>
+          </svg> -->
+        </button>
+        <span class="source-name" id="currentTrack">[ ... ]</span>
+        <div class="slider-container">
+          <span id="volumeLabel" class="label">🔊</span>
+          <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="0.8">
+        </div>
+      </div>
+      <div id="microphoneControls">
+        <button id="mute">🎤</button>
+        <span class="source-name">[microphone]</span>
+        <div class="slider-container">
+          <span class="label"></span>
+          <input type="range" id="gainControl" min="0" max="8" step="0.01" value="4">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Selector -->
+  <div id="audioSelector">
+    <h2>🔊 Music / Audio Source</h2>
+    <ul>
+      <button onclick="startMicrophoneInput()">🎤 Microphone</button>
+      <ul>
+        <label for="fileInput" id="fileInputLabel">📂 Choose File</label>
+        <input type="file" id="fileInput" accept="audio/*" multiple style="display:none;" />
+      </ul>
+      <!--
+        TODO: Leaving this here as an example of how to add playlists...
+        <button class="landscape-hide" onclick="selectPlaylist('dj2-low-orbit')">🎶 Low Orbit (DJ2)</button>
+        <button class="landscape-hide" onclick="selectPlaylist('dj2-continuum')">🎵 Continuum (DJ2)</button>
+      -->
+    </ul>
+    <button id="audioSelectCancel" onclick="setAudioSelectorVisible(false)">❌ Cancel</button>
+  </div>
+</body>
+</html>
