@@ -58,7 +58,7 @@ Rule #0:  This current version uses a SB/SB16 library, written by one
 
 Rule #1:  Go for it!!!  This is a free project - make it big!
 
-Rule #2:  Send me (zaph@torps.apana.org.au) a copy, so I can master the
+Rule #2:  Send me (zaph@torps.com) a copy, so I can master the
           code for other people.
 
 Rule #3:  Send me some Email telling me which bits you are playing with,

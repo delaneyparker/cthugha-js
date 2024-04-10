@@ -41,7 +41,7 @@ let tsArrayContent = `
 // ===================
 //
 // Feel free to modify this source code, HOWEVER, please send any working
-// changes/fixes to me (zaph@torps.apana.org.au) for inclusion in future
+// changes/fixes to me (zaph@torps.com) for inclusion in future
 // versions of the code.
 //
 // Distributing the code:
